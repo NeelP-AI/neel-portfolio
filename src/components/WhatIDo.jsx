@@ -18,7 +18,7 @@ const tickers = [
     id: 3,
     headline: "Regulatory scope just exploded?",
     approach: "New directive. Expanded coverage. Deadline unchanged. The fix: rebaselined delivery plans, RAID governance for every risk and dependency, jurisdiction-specific milestone tracking, and statutory deadlines met no matter how many times the scope shifts mid-flight.",
-    delivered: "A 7x regulatory scope expansion under AML trust registration requirements, from approximately 75 to 500 entities across 9 jurisdictions. 10+ legal entities coordinated. 100+ risks tracked. 100% registered on time. £2.5M+ in annual penalty exposure avoided. Zero missed deadlines."
+    delivered: "A 7x regulatory scope expansion under AML trust registration requirements, from approximately 75 to 500 trusts across 9 jurisdictions. 10+ legal entities coordinated. 100+ risks tracked. 100% registered on time. £2.5M+ in annual penalty exposure avoided. Zero missed deadlines."
   },
   {
     id: 4,
