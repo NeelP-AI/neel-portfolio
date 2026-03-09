@@ -7,35 +7,43 @@ const projects = [
     description: "A regulatory circular lands. 12 requirements need action. 3-person team, 90 days, no room for missed deadlines. This is the complete execution program. Built for a GIFT City IBU.",
     portfolio: "a",
     ready: true,
-    link: "/projects/ifsca-regulatory-change-execution"
+    link: "/projects/ifsca-regulatory-change-execution",
+    downloads: [
+      { label: ".xlsx", color: "bg-green-600" },
+      { label: ".pdf", color: "bg-red-600" }
+    ]
   },
   {
     title: "AML Control Register & Findings Lifecycle with Program Health Dashboard",
     description: "Root cause taxonomy and Three Lines of Defence mapping.",
     portfolio: "b",
     ready: false,
-    link: null
+    link: null,
+    downloads: []
   },
   {
     title: "STR Operations Playbook - Alert to FIU-IND Filing",
     description: "STR lifecycle, Principal Officer governance, FIU-IND filing, and sanctions-STR handoff. Built for IFSCA-regulated entities.",
     portfolio: "a",
     ready: false,
-    link: null
+    link: null,
+    downloads: []
   },
   {
     title: "Compliance Obligation Delivery & Governance Tracker",
     description: "Cross-functional compliance delivery governance and obligation tracking.",
     portfolio: "b",
     ready: false,
-    link: null
+    link: null,
+    downloads: []
   },
   {
     title: "AML/CFT Compliance Monitoring & Testing Program",
     description: "Compliance monitoring methodology, KYC/CDD control testing, and sample sizing. Built for IFSCA-regulated entities.",
     portfolio: "a",
     ready: false,
-    link: null
+    link: null,
+    downloads: []
   }
 ]
 
@@ -86,6 +94,24 @@ function Projects() {
                 <p className="font-body text-sm text-charcoal/60 leading-relaxed mb-5 flex-grow">
                   {project.description}
                 </p>
+
+                {/* Download badges */}
+                {project.downloads && project.downloads.length > 0 && (
+                  <div className="flex items-center gap-2 mb-5">
+                    {project.downloads.map((d, i) => (
+                      <span
+                        key={i}
+                        className={`${d.color} text-white text-xs font-body font-semibold px-2.5 py-1 rounded`}
+                      >
+                        {d.label}
+                      </span>
+                    ))}
+                    <span className="font-body text-xs text-charcoal/50 font-medium">
+                      Includes downloads
+                    </span>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-end mt-auto">
                   {project.ready ? (
                     <span className="inline-flex items-center gap-1 font-body text-sm font-medium text-gold group-hover:text-gold-dark transition-colors duration-300">
