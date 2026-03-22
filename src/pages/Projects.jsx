@@ -22,12 +22,15 @@ const projects = [
     downloads: []
   },
   {
-    title: "STR Operations Playbook - Alert to FIU-IND Filing",
-    description: "STR lifecycle, Principal Officer governance, FIU-IND filing, and sanctions-STR handoff. Built for IFSCA-regulated entities.",
+    title: "STR Lifecycle & Control Framework - Triage to Filing, Sanctions Governance & Post-Filing Monitoring",
+    description: "Complete STR control framework - triage, investigation, PO governance, sanctions handoff, FIU-IND filing, and post-filing monitoring. Built for a GIFT City IBU.",
     portfolio: "a",
-    ready: false,
-    link: null,
-    downloads: []
+    ready: true,
+    link: "/projects/str-operations-playbook",
+    downloads: [
+      { label: ".xlsx", color: "bg-green-600" },
+      { label: ".pdf", color: "bg-red-600" }
+    ]
   },
   {
     title: "Compliance Obligation Delivery & Governance Tracker",
