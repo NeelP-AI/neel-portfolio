@@ -14,16 +14,12 @@ const projects = [
     ]
   },
   {
-    title: "AML Control Register & Program Health Dashboard",
-    description: "19 controls registered. Lifecycle framework, risk-based testing schedule, RAG status tracking, and a live interactive dashboard built for Governing Body reporting. Built for a GIFT City IBU.",
+    title: "Compliance Obligation Delivery & Governance Tracker",
+    description: "Cross-functional compliance delivery governance and obligation tracking.",
     portfolio: "b",
-    ready: true,
-    link: "/projects/aml-control-register",
-    downloads: [
-      { label: ".xlsx", color: "bg-green-600" },
-      { label: ".pdf", color: "bg-red-600" },
-      { label: ".html", color: "bg-blue-600" }
-    ]
+    ready: false,
+    link: null,
+    downloads: []
   },
   {
     title: "STR Lifecycle & Control Framework - Triage to Filing, Sanctions Governance & Post-Filing Monitoring",
@@ -37,20 +33,24 @@ const projects = [
     ]
   },
   {
-    title: "Compliance Obligation Delivery & Governance Tracker",
-    description: "Cross-functional compliance delivery governance and obligation tracking.",
+    title: "AML/CFT Compliance Monitoring & Testing Program",
+    description: "Compliance monitoring methodology, KYC/CDD control testing, and sample sizing. Built for a GIFT City IBU.",
     portfolio: "b",
     ready: false,
     link: null,
     downloads: []
   },
   {
-    title: "AML/CFT Compliance Monitoring & Testing Program",
-    description: "Compliance monitoring methodology, KYC/CDD control testing, and sample sizing. Built for a GIFT City IBU.",
+    title: "AML Control Register & Program Health Dashboard",
+    description: "19 controls registered. Lifecycle framework, risk-based testing schedule, RAG status tracking, and a live interactive dashboard built for Governing Body reporting. Built for a GIFT City IBU.",
     portfolio: "a",
-    ready: false,
-    link: null,
-    downloads: []
+    ready: true,
+    link: "/projects/aml-control-register",
+    downloads: [
+      { label: ".xlsx", color: "bg-green-600" },
+      { label: ".pdf", color: "bg-red-600" },
+      { label: ".html", color: "bg-blue-600" }
+    ]
   }
 ]
 
