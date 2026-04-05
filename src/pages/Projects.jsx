@@ -16,7 +16,7 @@ const projects = [
   {
     title: "AML Control Register & Program Health Dashboard",
     description: "19 controls registered. Lifecycle framework, risk-based testing schedule, RAG status tracking, and a live interactive dashboard built for Governing Body reporting. Built for a GIFT City IBU.",
-    portfolio: "b",
+    portfolio: "a",
     ready: true,
     link: "/projects/aml-control-register",
     downloads: [
