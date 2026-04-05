@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AML Control Programme - Health Dashboard | Neel Parekh</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #EAECF0; color: #1A1A2E; }
+
+  /* ── Header ── */
+  .db-header {
+    background: #1F3864;
+    padding: 16px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid #C9A94A;
+  }
+  .db-header-left h1 { font-size: 16px; font-weight: 700; color: #C9A94A; letter-spacing: 0.02em; }
+  .db-header-left p { font-size: 11px; color: #A8B8D0; margin-top: 3px; }
+  .db-header-right { text-align: right; }
+  .db-header-right .report-period { font-size: 13px; font-weight: 700; color: #C9A94A; }
+  .db-header-right .report-sub { font-size: 10px; color: #A8B8D0; margin-top: 2px; }
+
+  /* ── Layout ── */
+  .db-body { padding: 16px 20px; }
+  .row { display: grid; gap: 12px; margin-bottom: 12px; }
+  .row-4 { grid-template-columns: repeat(4, 1fr); }
+  .row-2 { grid-template-columns: 1.5fr 1fr; }
+  .row-2b { grid-template-columns: 1fr 1fr; }
+  .row-1 { grid-template-columns: 1fr; }
+
+  /* ── Cards ── */
+  .card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 18px;
+    border: 0.5px solid #DDE1EA;
+  }
+  .card-title {
+    font-size: 10px;
+    font-weight: 700;
+    color: #6B7280;
+    text-transform: uppercase;
+    letter-spacing: 0.09em;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1.5px solid #C9A94A;
+    display: inline-block;
+  }
+
+  /* ── Metric cards ── */
+  .metric-card {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 18px;
+    border: 0.5px solid #DDE1EA;
+    border-top-width: 3px;
+  }
+  .metric-label { font-size: 10px; font-weight: 600; color: #6B7280; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .metric-num { font-size: 32px; font-weight: 700; line-height: 1; }
+  .metric-sub { font-size: 11px; color: #6B7280; margin-top: 5px; }
+  .progress-bar { height: 6px; border-radius: 3px; background: #E5E7EB; overflow: hidden; margin-top: 8px; }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+
+  /* ── Colours ── */
+  .c-green { color: #155724; }
+  .c-amber { color: #7F6000; }
+  .c-red   { color: #C00000; }
+  .c-navy  { color: #1F3864; }
+  .bg-green { background: #D4EDDA; }
+  .bg-amber { background: #FFF2CC; }
+  .bg-red   { background: #FCE4D6; }
+  .bg-blue  { background: #DDEEFF; }
+  .bc-green { border-color: #155724 !important; }
+  .bc-amber { border-color: #C9A94A !important; }
+  .bc-red   { border-color: #C00000 !important; }
+  .bc-navy  { border-color: #1F3864 !important; }
+
+  /* ── Tags ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  .tag-green { background: #D4EDDA; color: #155724; }
+  .tag-amber { background: #FFF2CC; color: #7F6000; }
+  .tag-red   { background: #FCE4D6; color: #C00000; }
+  .tag-blue  { background: #DDEEFF; color: #17375E; }
+  .tag-gray  { background: #F0F0F0; color: #555; }
+
+  /* ── Tables ── */
+  .tbl { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .tbl th {
+    background: #1F3864;
+    color: #C9A94A;
+    font-weight: 600;
+    padding: 7px 10px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 0.04em;
+  }
+  .tbl td { padding: 7px 10px; border-bottom: 0.5px solid #E5E7EB; color: #374151; vertical-align: middle; }
+  .tbl tr:last-child td { border-bottom: none; }
+  .tbl tr:hover td { background: #F8F9FA; }
+  .tbl td strong { color: #1F3864; }
+
+  /* ── Coverage grid ── */
+  .cov-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .cov-item {
+    border-radius: 6px;
+    padding: 10px 8px;
+    text-align: center;
+    border: 0.5px solid rgba(0,0,0,0.06);
+  }
+  .cov-clause { font-weight: 700; font-size: 11px; margin-bottom: 2px; }
+  .cov-name   { font-size: 9px; opacity: 0.8; margin-bottom: 6px; }
+
+  /* ── Legend ── */
+  .legend { display: flex; gap: 18px; margin-top: 10px; font-size: 11px; color: #6B7280; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .legend-sq { width: 11px; height: 11px; border-radius: 2px; display: inline-block; }
+
+  /* ── Chart wrappers ── */
+  .chart-wrap { position: relative; width: 100%; }
+
+  /* ── Footer ── */
+  .db-footer {
+    background: #1F3864;
+    padding: 10px 28px;
+    font-size: 10px;
+    color: #A8B8D0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+  }
+  .db-footer a { color: #C9A94A; text-decoration: none; }
+
+  /* ── Responsive ── */
+  @media (max-width: 900px) {
+    .row-4 { grid-template-columns: repeat(2, 1fr); }
+    .row-2, .row-2b { grid-template-columns: 1fr; }
+    .cov-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 500px) {
+    .row-4 { grid-template-columns: 1fr 1fr; }
+    .cov-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="db-header">
+  <div class="db-header-left">
+    <h1>AML Control Programme - Health Dashboard</h1>
+    <p>IFSCA IBU | GIFT City | Regulatory basis: IFSCA AML/CFT &amp; KYC Guidelines 2022 (Updated Feb 2026) | Neel Parekh - Compliance Execution Portfolio</p>
+  </div>
+  <div class="db-header-right">
+    <div class="report-period">Q1 2026</div>
+    <div class="report-sub">Report date: 31-Mar-2026</div>
+    <div class="report-sub" style="margin-top:4px;">Principal Officer sign-off required</div>
+  </div>
+</div>
+
+<div class="db-body">
+
+  <!-- Row 1: Metric Cards -->
+  <div class="row row-4">
+    <div class="metric-card bc-navy">
+      <div class="metric-label">Total Controls</div>
+      <div class="metric-num c-navy">19</div>
+      <div class="metric-sub">Across 6 categories</div>
+      <div class="metric-sub" style="margin-top:6px;">Regulatory change and STR controls registered</div>
+    </div>
+    <div class="metric-card bc-green">
+      <div class="metric-label">Green - Effective</div>
+      <div class="metric-num c-green">14</div>
+      <div class="metric-sub">74% of programme</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:74%;background:#28a745;"></div></div>
+    </div>
+    <div class="metric-card bc-amber">
+      <div class="metric-label">Amber - Monitor</div>
+      <div class="metric-num c-amber">3</div>
+      <div class="metric-sub">16% - exceptions noted</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:16%;background:#C9A94A;"></div></div>
+    </div>
+    <div class="metric-card bc-red">
+      <div class="metric-label">Red - Action Required</div>
+      <div class="metric-num c-red">2</div>
+      <div class="metric-sub">10% - escalated to findings management</div>
+      <div class="progress-bar"><div class="progress-fill" style="width:10%;background:#C00000;"></div></div>
+    </div>
+  </div>
+
+  <!-- Row 2: Bar + Line -->
+  <div class="row row-2">
+    <div class="card">
+      <div class="card-title">Control status by category</div>
+      <div class="chart-wrap" style="height:220px;margin-top:10px;">
+        <canvas id="barChart"></canvas>
+      </div>
+      <div class="legend">
+        <span><span class="legend-sq" style="background:#28a745;"></span>Green - Effective</span>
+        <span><span class="legend-sq" style="background:#C9A94A;"></span>Amber - Monitor</span>
+        <span><span class="legend-sq" style="background:#C00000;"></span>Red - Action Required</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Testing completion - 2026</div>
+      <div class="chart-wrap" style="height:220px;margin-top:10px;">
+        <canvas id="lineChart"></canvas>
+      </div>
+      <div class="legend">
+        <span><span class="legend-sq" style="background:#1F3864;"></span>Completed</span>
+        <span><span class="legend-sq" style="background:#C9A94A;border:1px dashed #C9A94A;"></span>Scheduled</span>
+      </div>
+      <div style="font-size:10px;color:#6B7280;margin-top:8px;">18 of 18 Q1 tests completed - 100% on time</div>
+    </div>
+  </div>
+
+  <!-- Row 3: Exceptions + Implementation/Upcoming -->
+  <div class="row row-2b">
+    <div class="card">
+      <div class="card-title">Open exceptions - Q1 2026 test log</div>
+      <table class="tbl" style="margin-top:10px;">
+        <thead>
+          <tr>
+            <th>Control ID</th>
+            <th>Control Name</th>
+            <th>Outcome</th>
+            <th>Escalation Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CTL-KYC-03</strong></td>
+            <td>Periodic KYC Refresh</td>
+            <td><span class="tag tag-red">Ineffective</span></td>
+            <td><span class="tag tag-red">HIGH finding</span></td>
+          </tr>
+          <tr>
+            <td><strong>CTL-STR-02</strong></td>
+            <td>Alert Triage SLA</td>
+            <td><span class="tag tag-red">Ineffective</span></td>
+            <td><span class="tag tag-red">HIGH finding</span></td>
+          </tr>
+          <tr>
+            <td><strong>CTL-KYC-01</strong></td>
+            <td>BO Threshold Monitoring</td>
+            <td><span class="tag tag-amber">Partially Effective</span></td>
+            <td><span class="tag tag-amber">MEDIUM finding</span></td>
+          </tr>
+          <tr>
+            <td><strong>CTL-EDD-01</strong></td>
+            <td>Indian National BO EDD</td>
+            <td><span class="tag tag-amber">Partially Effective</span></td>
+            <td><span class="tag tag-amber">MEDIUM finding</span></td>
+          </tr>
+          <tr>
+            <td><strong>CTL-KYC-07</strong></td>
+            <td>Non-Face-to-Face CDD</td>
+            <td><span class="tag tag-amber">Partially Effective</span></td>
+            <td><span class="tag tag-gray">Noted - no escalation</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">Controls in implementation - Jan 2026 amendments</div>
+      <table class="tbl" style="margin-top:10px;">
+        <thead>
+          <tr><th>Control ID</th><th>Control</th><th>Amendment</th><th>Target</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>CTL-KYC-06</strong></td>
+            <td>Resident Indian Periodicity</td>
+            <td><span class="tag tag-blue">Jan 2026</span></td>
+            <td>Q2 2026</td>
+          </tr>
+          <tr>
+            <td><strong>CTL-VCIP-01</strong></td>
+            <td>V-CIP NRI Jurisdiction</td>
+            <td><span class="tag tag-blue">Jan 2026</span></td>
+            <td>Q2 2026</td>
+          </tr>
+          <tr>
+            <td><strong>CTL-EDD-01</strong></td>
+            <td>Indian National BO EDD</td>
+            <td><span class="tag tag-blue">Jan 2026</span></td>
+            <td>Q2 2026</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:16px;">
+        <div class="card-title">Upcoming tests - next 30 days</div>
+        <table class="tbl" style="margin-top:8px;">
+          <thead>
+            <tr><th>Control ID</th><th>Control</th><th>Due Date</th><th>Tester</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>CTL-STR-01</strong></td><td>STR Filing - PO Sign-Off</td><td>15-Apr-2026</td><td>A. Sharma</td></tr>
+            <tr><td><strong>CTL-STR-02</strong></td><td>Alert Triage SLA</td><td>15-Apr-2026</td><td>A. Sharma</td></tr>
+            <tr><td><strong>CTL-SAN-01</strong></td><td>Sanctions Screening</td><td>15-Apr-2026</td><td>R. Desai</td></tr>
+            <tr><td><strong>CTL-TREAS-01</strong></td><td>Wire Transfer Info</td><td>15-Apr-2026</td><td>R. Desai</td></tr>
+            <tr><td><strong>CTL-KYC-02</strong></td><td>CDD 30-Day Deadline</td><td>15-Apr-2026</td><td>P. Mehta</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 4: Regulatory coverage map -->
+  <div class="row row-1">
+    <div class="card">
+      <div class="card-title">Regulatory coverage map - IFSCA clause to active control | RAG status</div>
+      <div class="cov-grid">
+
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 1.5(a)</div>
+          <div class="cov-name c-green">Policy Governance</div>
+          <span class="tag tag-green">CTL-GOV-01</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 1.3.3</div>
+          <div class="cov-name c-green">BO Threshold 10%</div>
+          <span class="tag tag-amber">CTL-KYC-01</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 5.3</div>
+          <div class="cov-name c-green">CDD 30-Day Rule</div>
+          <span class="tag tag-green">CTL-KYC-02</span>
+        </div>
+        <div class="cov-item bg-red">
+          <div class="cov-clause c-red">Clause 5.11</div>
+          <div class="cov-name c-red">Periodic KYC Refresh</div>
+          <span class="tag tag-red">CTL-KYC-03</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 5.5</div>
+          <div class="cov-name c-green">PEP Identification</div>
+          <span class="tag tag-green">CTL-KYC-04</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 5.6</div>
+          <div class="cov-name c-green">EDD High Risk</div>
+          <span class="tag tag-green">CTL-KYC-05</span>
+        </div>
+        <div class="cov-item bg-amber">
+          <div class="cov-clause c-amber">Clause 5.11 (Jan 26)</div>
+          <div class="cov-name c-amber">Resident Indian</div>
+          <span class="tag tag-amber">CTL-KYC-06</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 5.4.3</div>
+          <div class="cov-name c-green">Non-Face-to-Face CDD</div>
+          <span class="tag tag-amber">CTL-KYC-07</span>
+        </div>
+        <div class="cov-item bg-amber">
+          <div class="cov-clause c-amber">Clause 5.6(9) (Jan 26)</div>
+          <div class="cov-name c-amber">Indian National BO EDD</div>
+          <span class="tag tag-amber">CTL-EDD-01</span>
+        </div>
+        <div class="cov-item bg-amber">
+          <div class="cov-clause c-amber">Annexure II (Jan 26)</div>
+          <div class="cov-name c-amber">V-CIP NRI Jurisdiction</div>
+          <span class="tag tag-amber">CTL-VCIP-01</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 10.3 / PMLA R7</div>
+          <div class="cov-name c-green">STR Filing - PO Sign-Off</div>
+          <span class="tag tag-green">CTL-STR-01</span>
+        </div>
+        <div class="cov-item bg-red">
+          <div class="cov-clause c-red">Clause 10.1 / 10.2</div>
+          <div class="cov-name c-red">Alert Triage SLA</div>
+          <span class="tag tag-red">CTL-STR-02</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 10.2 / 10.3</div>
+          <div class="cov-name c-green">Investigation Standard</div>
+          <span class="tag tag-green">CTL-STR-03</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 10.3(2A) (Jan 26)</div>
+          <div class="cov-name c-green">No Account Restrictions</div>
+          <span class="tag tag-green">CTL-STR-04</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 10.4 / PMLA S13</div>
+          <div class="cov-name c-green">Tipping-Off Prohibition</div>
+          <span class="tag tag-green">CTL-STR-05</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clauses 5.9 / 7.3-7.5</div>
+          <div class="cov-name c-green">Sanctions-to-STR Log</div>
+          <span class="tag tag-green">CTL-STR-06</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clause 7.7.3</div>
+          <div class="cov-name c-green">Wire Transfer Info</div>
+          <span class="tag tag-green">CTL-TREAS-01</span>
+        </div>
+        <div class="cov-item bg-green">
+          <div class="cov-clause c-green">Clauses 5.9 / 11.1(a)</div>
+          <div class="cov-name c-green">Daily Sanctions Screening</div>
+          <span class="tag tag-green">CTL-SAN-01</span>
+        </div>
+
+      </div>
+      <div class="legend" style="margin-top:14px;">
+        <span><span class="legend-sq" style="background:#D4EDDA;border:0.5px solid #28a745;"></span>Green - control effective</span>
+        <span><span class="legend-sq" style="background:#FFF2CC;border:0.5px solid #C9A94A;"></span>Amber - partially effective or in implementation</span>
+        <span><span class="legend-sq" style="background:#FCE4D6;border:0.5px solid #C00000;"></span>Red - ineffective, escalated to findings management</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="db-footer">
+  <div>Neel Parekh - Compliance Execution Portfolio | GIFT City / IFSCA IBU Focus | Data: AML Control Register and Program Health Workbook (Tab 4)</div>
+  <div>Regulatory basis: IFSCA AML/CFT &amp; KYC Guidelines 2022 (Updated Feb 2026) | PMLA | UAPA</div>
+</div>
+
+<script>
+const barCtx = document.getElementById('barChart').getContext('2d');
+new Chart(barCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Governance','KYC/CDD','STR','EDD','Wire Transfer','Sanctions'],
+    datasets: [
+      { label: 'Green', data: [1, 5, 4, 0, 1, 1], backgroundColor: '#28a745' },
+      { label: 'Amber', data: [0, 3, 0, 1, 0, 0], backgroundColor: '#C9A94A' },
+      { label: 'Red',   data: [0, 0, 2, 0, 0, 0], backgroundColor: '#C00000' }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: {
+        label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.x} control${ctx.parsed.x !== 1 ? 's' : ''}`
+      }
+    }},
+    scales: {
+      x: {
+        stacked: true,
+        ticks: { font: { size: 10, family: 'Segoe UI' }, stepSize: 1, color: '#6B7280' },
+        grid: { color: '#F0F0F0' },
+        max: 9
+      },
+      y: {
+        stacked: true,
+        ticks: { font: { size: 10, family: 'Segoe UI' }, color: '#374151' },
+        grid: { display: false }
+      }
+    }
+  }
+});
+
+const lineCtx = document.getElementById('lineChart').getContext('2d');
+new Chart(lineCtx, {
+  type: 'line',
+  data: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    datasets: [
+      {
+        label: 'Tests completed',
+        data: [5, 8, 18, null, null, null, null, null, null, null, null, null],
+        borderColor: '#1F3864',
+        backgroundColor: 'rgba(31,56,100,0.07)',
+        pointBackgroundColor: '#1F3864',
+        pointRadius: 4,
+        tension: 0.35,
+        fill: true
+      },
+      {
+        label: 'Tests scheduled',
+        data: [5, 8, 18, 18, 5, 18, 5, 5, 18, 5, 5, 19],
+        borderColor: '#C9A94A',
+        borderDash: [5, 4],
+        backgroundColor: 'transparent',
+        pointBackgroundColor: '#C9A94A',
+        pointRadius: 3,
+        tension: 0.35,
+        fill: false
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: {
+      callbacks: {
+        label: ctx => ctx.parsed.y !== null ? ` ${ctx.dataset.label}: ${ctx.parsed.y} tests` : ''
+      }
+    }},
+    scales: {
+      x: {
+        ticks: { font: { size: 10, family: 'Segoe UI' }, color: '#6B7280', autoSkip: false },
+        grid: { color: '#F0F0F0' }
+      },
+      y: {
+        ticks: { font: { size: 10, family: 'Segoe UI' }, color: '#6B7280', stepSize: 5 },
+        grid: { color: '#F0F0F0' },
+        min: 0, max: 25
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>

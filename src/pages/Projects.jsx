@@ -14,12 +14,16 @@ const projects = [
     ]
   },
   {
-    title: "AML Control Register & Findings Lifecycle with Program Health Dashboard",
-    description: "Root cause taxonomy and Three Lines of Defence mapping.",
+    title: "AML Control Register & Program Health Dashboard",
+    description: "19 controls registered. Lifecycle framework, risk-based testing schedule, RAG status tracking, and a live interactive dashboard built for Governing Body reporting. Built for a GIFT City IBU.",
     portfolio: "b",
-    ready: false,
-    link: null,
-    downloads: []
+    ready: true,
+    link: "/projects/aml-control-register",
+    downloads: [
+      { label: ".xlsx", color: "bg-green-600" },
+      { label: ".pdf", color: "bg-red-600" },
+      { label: ".html", color: "bg-blue-600" }
+    ]
   },
   {
     title: "STR Lifecycle & Control Framework - Triage to Filing, Sanctions Governance & Post-Filing Monitoring",
