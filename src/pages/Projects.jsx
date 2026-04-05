@@ -46,7 +46,7 @@ const projects = [
   },
   {
     title: "AML/CFT Compliance Monitoring & Testing Program",
-    description: "Compliance monitoring methodology, KYC/CDD control testing, and sample sizing. Built for IFSCA-regulated entities.",
+    description: "Compliance monitoring methodology, KYC/CDD control testing, and sample sizing. Built for a GIFT City IBU.",
     portfolio: "a",
     ready: false,
     link: null,
